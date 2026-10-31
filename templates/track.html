@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+
+{% block title %}Track Complaint - Public Grievance AI Assistant{% endblock %}
+
+{% block content %}
+<div class="container">
+    <section class="track-section">
+        <h1>Track Your Complaint</h1>
+        
+        {% if request.query_params.get('new') == '1' and complaint %}
+        <div class="alert alert-success">
+            <strong>Success!</strong> Your complaint has been submitted successfully. Your ticket ID is: <strong>{{ complaint.ticket }}</strong>
+        </div>
+        {% endif %}
+        
+        <form action="/track/{{ ticket }}" method="get" class="track-form">
+            <div class="form-group">
+                <label for="ticket">Enter Ticket ID</label>
+                <input type="text" id="ticket" name="ticket" value="{{ ticket }}" placeholder="GRV-XXXXXXXX" pattern="GRV-[A-F0-9]{8}" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Track Status</button>
+        </form>
+        
+        {% if complaint %}
+        <div class="complaint-details">
+            <h2>Complaint Details</h2>
+            
+            <div class="detail-grid">
+                <div class="detail-item">
+                    <span class="label">Ticket ID:</span>
+                    <span class="value">{{ complaint.ticket }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="label">Status:</span>
+                    <span class="value"><span class="badge badge-status-{{ complaint.status.lower().replace(' ', '-') }}">{{ complaint.status }}</span></span>
+                </div>
+                <div class="detail-item">
+                    <span class="label">Category:</span>
+                    <span class="value"><span class="badge badge-category">{{ complaint.category }}</span></span>
+                </div>
+                <div class="detail-item">
+                    <span class="label">Priority:</span>
+                    <span class="value"><span class="badge badge-{{ complaint.priority.lower() }}">{{ complaint.priority }}</span></span>
+                </div>
+                <div class="detail-item">
+                    <span class="label">Citizen:</span>
+                    <span class="value">{{ complaint.citizen }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="label">Email:</span>
+                    <span class="value">{{ complaint.email }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="label">Subject:</span>
+                    <span class="value">{{ complaint.subject }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="label">Location:</span>
+                    <span class="value">{{ complaint.location }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="label">Department:</span>
+                    <span class="value">{{ complaint.department }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="label">Created:</span>
+                    <span class="value">{{ complaint.created_at }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="label">Updated:</span>
+                    <span class="value">{{ complaint.updated_at }}</span>
+                </div>
+                {% if complaint.attachment %}
+                <div class="detail-item">
+                    <span class="label">Attachment:</span>
+                    <span class="value"><a href="/uploads/{{ complaint.attachment }}" target="_blank">View File</a></span>
+                </div>
+                {% endif %}
+            </div>
+            
+            <div class="description-section">
+                <h3>Description</h3>
+                <p>{{ complaint.description }}</p>
+            </div>
+            
+            {% if complaint.admin_note %}
+            <div class="admin-note-section">
+                <h3>Admin Notes</h3>
+                <p>{{ complaint.admin_note }}</p>
+            </div>
+            {% endif %}
+        </div>
+        {% elif ticket %}
+        <div class="alert alert-error">
+            <strong>Not Found:</strong> No complaint found with ticket ID "{{ ticket }}". Please check and try again.
+        </div>
+        {% endif %}
+    </section>
+</div>
+
+{% block extra_scripts %}
+<script>
+// Auto-redirect to tracking page when form is submitted
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('.track-form');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const ticketInput = document.getElementById('ticket');
+            const ticket = ticketInput.value.trim().toUpperCase();
+            if (ticket) {
+                window.location.href = '/track/' + ticket;
+            }
+        });
+    }
+});
+</script>
+{% endblock %}
+{% endblock %}

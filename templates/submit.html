@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}Submit Complaint - Public Grievance AI Assistant{% endblock %}
+
+{% block content %}
+<div class="container">
+    <section class="form-section">
+        <h1>Submit a Public Grievance</h1>
+        <p class="subtitle">Fill out the form below to report a public issue. Our AI will classify and route it to the appropriate department.</p>
+        
+        <form action="/submit" method="post" enctype="multipart/form-data" class="complaint-form">
+            <div class="form-group">
+                <label for="citizen">Your Name *</label>
+                <input type="text" id="citizen" name="citizen" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="email">Email Address *</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="subject">Subject *</label>
+                <input type="text" id="subject" name="subject" required placeholder="Brief summary of the issue">
+            </div>
+            
+            <div class="form-group">
+                <label for="description">Detailed Description *</label>
+                <textarea id="description" name="description" rows="6" required placeholder="Describe the issue in detail. Include relevant keywords like 'garbage', 'water', 'pothole', etc."></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="location">Location *</label>
+                <input type="text" id="location" name="location" required placeholder="Street, area, or landmark">
+            </div>
+            
+            <div class="form-group">
+                <label for="attachment">Attachment (optional)</label>
+                <input type="file" id="attachment" name="attachment" accept=".png,.jpg,.jpeg,.pdf,.txt,.doc,.docx">
+                <small>Allowed: Images, PDF, or documents (max size depends on server config)</small>
+            </div>
+            
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Submit Complaint</button>
+                <a href="/" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </section>
+</div>
+{% endblock %}

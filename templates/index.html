@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Public Grievance AI Assistant{% endblock %}
+
+{% block content %}
+<div class="container">
+    <section class="hero">
+        <h1>Welcome to Public Grievance AI Assistant</h1>
+        <p class="subtitle">Your voice matters. Report public issues and track their resolution.</p>
+        <div class="cta-buttons">
+            <a href="/submit" class="btn btn-primary">Submit a Complaint</a>
+            <a href="/track" class="btn btn-secondary">Track Your Complaint</a>
+        </div>
+    </section>
+    
+    <section class="stats">
+        <div class="stat-card">
+            <h3>{{ total }}</h3>
+            <p>Total Complaints</p>
+        </div>
+        <div class="stat-card">
+            <h3>{{ resolved }}</h3>
+            <p>Resolved</p>
+        </div>
+        <div class="stat-card">
+            <h3>{{ pending }}</h3>
+            <p>Pending</p>
+        </div>
+    </section>
+    
+    <section class="recent-complaints">
+        <h2>Recent Complaints</h2>
+        {% if recent %}
+        <table class="complaints-table">
+            <thead>
+                <tr>
+                    <th>Ticket ID</th>
+                    <th>Category</th>
+                    <th>Subject</th>
+                    <th>Priority</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for complaint in recent %}
+                <tr>
+                    <td><a href="/track/{{ complaint.ticket }}">{{ complaint.ticket }}</a></td>
+                    <td><span class="badge badge-category">{{ complaint.category }}</span></td>
+                    <td>{{ complaint.subject }}</td>
+                    <td><span class="badge badge-{{ complaint.priority.lower() }}">{{ complaint.priority }}</span></td>
+                    <td><span class="badge badge-status-{{ complaint.status.lower().replace(' ', '-') }}">{{ complaint.status }}</span></td>
+                    <td>{{ complaint.created_at[:10] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>No complaints yet. Be the first to submit one!</p>
+        {% endif %}
+    </section>
+</div>
+{% endblock %}

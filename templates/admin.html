@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - Public Grievance AI Assistant{% endblock %}
+
+{% block content %}
+<div class="container">
+    <section class="admin-section">
+        <h1>Admin Dashboard</h1>
+        
+        <div class="stats">
+            <div class="stat-card">
+                <h3>{{ total }}</h3>
+                <p>Total</p>
+            </div>
+            <div class="stat-card">
+                <h3>{{ stats.Submitted }}</h3>
+                <p>Submitted</p>
+            </div>
+            <div class="stat-card">
+                <h3>{{ stats['In Progress'] }}</h3>
+                <p>In Progress</p>
+            </div>
+            <div class="stat-card">
+                <h3>{{ stats.Resolved }}</h3>
+                <p>Resolved</p>
+            </div>
+        </div>
+        
+        <div class="filters">
+            <form action="/admin" method="get" class="filter-form">
+                <div class="form-group">
+                    <input type="text" name="q" placeholder="Search by ticket, subject, citizen, or location" value="{{ q }}">
+                </div>
+                <div class="form-group">
+                    <select name="status">
+                        <option value="All" {% if status == 'All' %}selected{% endif %}>All Status</option>
+                        <option value="Submitted" {% if status == 'Submitted' %}selected{% endif %}>Submitted</option>
+                        <option value="In Progress" {% if status == 'In Progress' %}selected{% endif %}>In Progress</option>
+                        <option value="Resolved" {% if status == 'Resolved' %}selected{% endif %}>Resolved</option>
+                        <option value="Rejected" {% if status == 'Rejected' %}selected{% endif %}>Rejected</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">Filter</button>
+                <a href="/admin" class="btn btn-secondary">Reset</a>
+            </form>
+        </div>
+        
+        {% if rows %}
+        <table class="complaints-table admin-table">
+            <thead>
+                <tr>
+                    <th>Ticket</th>
+                    <th>Citizen</th>
+                    <th>Category</th>
+                    <th>Subject</th>
+                    <th>Location</th>
+                    <th>Priority</th>
+                    <th>Status</th>
+                    <th>Created</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in rows %}
+                <tr>
+                    <td><a href="/track/{{ row.ticket }}">{{ row.ticket }}</a></td>
+                    <td>{{ row.citizen }}</td>
+                    <td><span class="badge badge-category">{{ row.category }}</span></td>
+                    <td>{{ row.subject }}</td>
+                    <td>{{ row.location }}</td>
+                    <td><span class="badge badge-{{ row.priority.lower() }}">{{ row.priority }}</span></td>
+                    <td><span class="badge badge-status-{{ row.status.lower().replace(' ', '-') }}">{{ row.status }}</span></td>
+                    <td>{{ row.created_at[:10] }}</td>
+                    <td>
+                        <button class="btn btn-small" onclick="openUpdateModal('{{ row.ticket }}', '{{ row.status }}', '{{ row.admin_note }}')">Update</button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>No complaints found matching your filters.</p>
+        {% endif %}
+    </section>
+</div>
+
+<!-- Update Modal -->
+<div id="updateModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeUpdateModal()">&times;</span>
+        <h2>Update Complaint Status</h2>
+        <form id="updateForm" method="post" action="">
+            <div class="form-group">
+                <label for="status">Status *</label>
+                <select id="status" name="status" required>
+                    <option value="Submitted">Submitted</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Resolved">Resolved</option>
+                    <option value="Rejected">Rejected</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="admin_note">Admin Notes</label>
+                <textarea id="admin_note" name="admin_note" rows="4" placeholder="Add notes about this complaint"></textarea>
+            </div>
+            
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Update</button>
+                <button type="button" class="btn btn-secondary" onclick="closeUpdateModal()">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% block extra_scripts %}
+<script>
+function openUpdateModal(ticket, currentStatus, adminNote) {
+    const modal = document.getElementById('updateModal');
+    const form = document.getElementById('updateForm');
+    const statusSelect = document.getElementById('status');
+    const adminNoteTextarea = document.getElementById('admin_note');
+    
+    form.action = '/admin/' + ticket + '/update';
+    statusSelect.value = currentStatus;
+    adminNoteTextarea.value = adminNote || '';
+    
+    modal.style.display = 'block';
+}
+
+function closeUpdateModal() {
+    document.getElementById('updateModal').style.display = 'none';
+}
+
+// Close modal when clicking outside
+window.onclick = function(event) {
+    const modal = document.getElementById('updateModal');
+    if (event.target == modal) {
+        modal.style.display = 'none';
+    }
+}
+</script>
+{% endblock %}
+{% endblock %}
